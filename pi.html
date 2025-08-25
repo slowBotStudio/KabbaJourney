@@ -3,46 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <title>Анализ поездки Cabbakid 🚴‍♂️💩</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-box-plot@1.2.0/build/Chart.BoxPlot.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f7f9fc;
-            color: #333;
+            background-color: #121212;
+            color: #e0e0e0;
             margin: 0;
             padding: 20px;
+            overflow-x: hidden;
+            position: relative;
         }
         .container {
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 30px;
+            background: #1e1e1e;
+            border-radius: 14px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease-in;
+        }
+        /* Animated poop emoji wallpaper at the very back */
+        .poop-background {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.08;
+        }
+        .poop-background .poop {
+            position: absolute;
+            font-size: 28px;
+            animation: poopBlink 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 2px rgba(141,110,99,0.35));
+        }
+        @keyframes poopBlink {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         h1, h2 {
             text-align: center;
-            color: #2c3e50;
+            color: #bb86fc;
+            text-shadow: 0 0 10px rgba(187, 134, 252, 0.3);
         }
         h1 {
             margin-bottom: 10px;
+            font-size: 2.2em;
         }
         .subtitle {
             text-align: center;
-            color: #7f8c8d;
+            color: #9aa7b0;
             font-style: italic;
             margin-bottom: 30px;
+            font-size: 1.1em;
         }
         .chart-container {
-            width: 90%;
+            width: 95%;
             max-width: 900px;
-            margin: 30px auto;
-            padding: 15px;
-            background: #f9fafa;
-            border-radius: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            margin: 40px auto;
+            padding: 20px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            position: relative;
+            height: 400px;
+            opacity: 1; /* always visible */
+            transform: translateY(0);
+            transition: opacity 0.8s ease, transform 0.8s ease;
         }
+        .chart-container.visible { opacity: 1; transform: translateY(0); }
+        .chart-container::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(187,134,252,0.35), rgba(3,218,198,0.2));
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+                    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+            pointer-events: none;
+        }
+        .chart-container:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.35); }
+        .emoji-big { animation: glow 2.4s ease-in-out infinite; }
+        @keyframes glow {
+            0%,100% { filter: drop-shadow(0 0 0px rgba(255,193,7,0.0)); transform: translateY(0); }
+            50% { filter: drop-shadow(0 0 8px rgba(255,193,7,0.6)); transform: translateY(-2px); }
+        }
+        .legend .emoji { animation: twinkle 3s ease-in-out infinite; display: inline-block; }
+        @keyframes twinkle { 0%,100% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(-8deg) scale(1.08); } }
         .emoji {
             font-size: 1.4em;
             margin: 0 4px;
@@ -50,54 +103,100 @@
         .legend {
             text-align: center;
             font-size: 0.9em;
-            color: #555;
+            color: #aaa;
             margin: 15px 0;
         }
         .info-box {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-            font-size: 0.95em;
-            border-left: 5px solid #2196f3;
+            background: #2c3642;
+            padding: 18px;
+            border-radius: 10px;
+            margin: 25px 0;
+            font-size: 1em;
+            border-left: 5px solid #03dac6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         .flex {
             display: flex;
             justify-content: space-around;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
+            gap: 15px;
+            margin: 20px 0;
         }
         .flex .day {
             text-align: center;
-            background: #f1f8e9;
-            padding: 10px;
-            border-radius: 8px;
+            background: #2c3642;
+            padding: 14px;
+            border-radius: 10px;
             flex: 1;
-            min-width: 180px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+            min-width: 160px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            border: 1px solid #3a3a3a;
+            transition: all 0.3s;
+        }
+        .flex .day:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
         }
         .flex .emoji-big {
-            font-size: 2em;
+            font-size: 2.2em;
             line-height: 1;
+            text-shadow: 0 0 8px rgba(255, 193, 7, 0.4);
         }
         footer {
             text-align: center;
-            margin-top: 40px;
-            color: #999;
+            margin-top: 50px;
+            color: #666;
             font-size: 0.85em;
+            animation: float 3s infinite ease-in-out;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .loading {
+            text-align: center;
+            color: #bb86fc;
+            font-size: 1.2em;
+            margin: 20px 0;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .loading.visible {
+            opacity: 1;
+        }
+        /* Foreground poop rain overlay */
+        .poop-rain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 5;
+            overflow: hidden;
+        }
+        .poop-drop {
+            position: absolute;
+            will-change: transform, opacity;
+            font-size: 110px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.45));
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-20vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(180deg); opacity: 0.85; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Анализ поездки стримера Cabbakid 🚴‍♂️</h1>
+    <div class="poop-background" id="poopBg" aria-hidden="true"></div>
+    <div class="poop-rain" id="poopRain" aria-hidden="true"></div>
+    <div class="container" style="position: relative; z-index: 1;">
+        <h1>Анализ поездки Cabbakid 🚴‍♂️</h1>
         <p class="subtitle">Температура, погода, здоровье и <span class="emoji">💩</span> в реальных условиях вело-путешествия</p>
 
         <div class="info-box">
             <p><strong>Маршрут:</strong> Санкт-Петербург → Кипуя (119 км) → Сясьтрой (35 км) → Паша → Лодейное поле (98 км)</p>
-            <p><strong>Транспорт:</strong> Велосипед 🚴‍♂️ | <strong>Остановки:</strong> гостиницы, туалеты 🚽 и <span class="emoji">🤢</span></p>
+            <p><strong>Транспорт:</strong> Велосипед 🚴‍♂️ | <strong>Остановки:</strong> туалеты 🚽 и <span class="emoji">🤢</span></p>
         </div>
 
         <div class="flex">
@@ -115,440 +214,377 @@
             </div>
         </div>
 
-        <!-- Диаграмма 1: Температура и количество дефекаций -->
-        <div class="chart-container">
-            <canvas id="tempPoopChart"></canvas>
-            <p class="legend">Температура (°C) 🌡️ | Дефекации <span class="emoji">💩</span></p>
+        <div class="loading" id="loading">Загрузка данных поездки...</div>
+
+        <!-- Диаграммы -->
+        <div class="chart-container" id="tempPoopChart">
+            <canvas id="canvasTempPoop"></canvas>
+            <p class="legend">🌡️ Температура vs 💩 Дефекации — чем жарче, тем активнее кишечник? Сравним города и заметим пики.</p>
         </div>
 
-        <!-- Диаграмма 2: Влажность и количество дефекаций -->
-        <div class="chart-container">
-            <canvas id="humidityPoopChart"></canvas>
-            <p class="legend">Влажность (%) 💧 | Дефекации <span class="emoji">💩</span></p>
+        <div class="chart-container" id="humidityPoopChart">
+            <canvas id="canvasHumidityPoop"></canvas>
+            <p class="legend">💧 Влажность vs 💩 Дефекации — как сырость влияет на частоту? Ищем закономерности.</p>
         </div>
 
-        <!-- Диаграмма 3: Погода и количество дефекаций -->
-        <div class="chart-container">
-            <canvas id="weatherPoopChart"></canvas>
-            <p class="legend">Погода ☔☁ | Всего дефекаций <span class="emoji">💩</span></p>
+        <div class="chart-container" id="weatherPoopChart">
+            <canvas id="canvasWeatherPoop"></canvas>
+            <p class="legend">☁️/🌧️ Погода и суммарные 💩 — в какой погоде организм реагирует чаще?</p>
         </div>
 
-        <!-- Диаграмма 4: Наличие тёплой воды и качество сна -->
-        <div class="chart-container">
-            <canvas id="waterSleepChart"></canvas>
-            <p class="legend">Тёплая вода 🚿 | Качество сна 😴</p>
+        <div class="chart-container" id="waterSleepChart">
+            <canvas id="canvasWaterSleep"></canvas>
+            <p class="legend">🚿 Наличие тёплой воды и 😴 качество сна — влияет ли комфорт на восстановление?</p>
         </div>
 
-        <!-- Диаграмма 5: Отравление и количество дефекаций -->
-        <div class="chart-container">
-            <canvas id="poisoningPoopChart"></canvas>
-            <p class="legend">Отравление <span class="emoji">🤢</span> | Среднее количество дефекаций <span class="emoji">💩</span></p>
+        <div class="chart-container" id="poisoningPoopChart">
+            <canvas id="canvasPoisoningPoop"></canvas>
+            <p class="legend">🤢 Состояние отравления и среднее число 💩 — как влияет недомогание?</p>
         </div>
 
-        <!-- Диаграмма 6: Пройденные километры -->
-        <div class="chart-container">
-            <canvas id="distanceChart"></canvas>
-            <p class="legend">Пройдено км 🚴‍♂️ | Дефекации <span class="emoji">💩</span></p>
+        <div class="chart-container" id="distanceChart">
+            <canvas id="canvasDistance"></canvas>
+            <p class="legend">🚴‍♂️ Пробег (км) vs 💩 — больше километров, больше остановок? Сопоставим.</p>
         </div>
 
-        <footer>
-            Анализ вело-путешествия Cabbakid: данные о погоде, здоровье и <span class="emoji">💩</span> | Визуализация с любовью ❤️
-        </footer>
+        <footer>Анализ вело-путешествия Cabbakid: данные о погоде, здоровье и <span class="emoji">💩</span> | Визуализация с любовью ❤️</footer>
     </div>
 
     <script>
+        // Показываем загрузку
+        document.getElementById('loading').classList.add('visible');
+
         // Данные
         const data = [
-            {
-                city: "Кипуя",
-                temp: 10,
-                humidity: 84,
-                weather: "Дождь",
-                hotel: true,
-                warmWater: false,
-                sleep: "плохо",
-                poisoned: true,
-                poopCount: 5,
-                distance: 119
-            },
-            {
-                city: "Сясьтрой",
-                temp: 15,
-                humidity: 76,
-                weather: "Облачно",
-                hotel: true,
-                warmWater: false,
-                sleep: "плохо",
-                poisoned: true,
-                poopCount: 8,
-                distance: 35
-            },
-            {
-                city: "Паша",
-                temp: 15,
-                humidity: 71,
-                weather: "Облачно",
-                hotel: false,
-                warmWater: null,
-                sleep: null,
-                poisoned: false,
-                poopCount: 4,
-                distance: 0  // только остановка
-            },
-            {
-                city: "Лодейное поле",
-                temp: 14,
-                humidity: 90,
-                weather: "Дождь",
-                hotel: true,
-                warmWater: true,
-                sleep: "хорошо",
-                poisoned: false,
-                poopCount: 10,
-                distance: 98
-            }
+            { city: "Кипуя", temp: 10, humidity: 84, weather: "Дождь", warmWater: false, sleep: "плохо", poisoned: true, poopCount: 5, distance: 119 },
+            { city: "Сясьтрой", temp: 15, humidity: 76, weather: "Облачно", warmWater: false, sleep: "плохо", poisoned: true, poopCount: 8, distance: 35 },
+            { city: "Паша", temp: 15, humidity: 71, weather: "Облачно", warmWater: null, sleep: null, poisoned: false, poopCount: 4, distance: 0 },
+            { city: "Лодейное поле", temp: 14, humidity: 90, weather: "Дождь", warmWater: true, sleep: "хорошо", poisoned: false, poopCount: 10, distance: 98 }
         ];
 
-        // Города
         const allCities = data.map(d => d.city);
         const filteredData = data.filter(d => d.city !== "Паша");
-        const citiesNoPasha = filteredData.map(d => d.city);
 
-        // Диаграмма 1: Температура и количество дефекаций
-        const tempCtx = document.getElementById('tempPoopChart').getContext('2d');
-        new Chart(tempCtx, {
-            type: 'bar',
-            data: {
-                labels: allCities,
-                datasets: [
-                    {
-                        label: 'Температура (°C) 🌡️',
-                         data.map(d => d.temp),
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        yAxisID: 'y-temp'
-                    },
-                    {
-                        label: 'Дефекации <span class="emoji">💩</span>',
-                         data.map(d => d.poopCount),
-                        type: 'line',
-                        borderColor: 'rgba(139, 69, 19, 1)',
-                        backgroundColor: 'rgba(139, 69, 19, 0.2)',
-                        fill: false,
-                        yAxisID: 'y-pooping',
-                        pointBackgroundColor: data.map(d => d.poisoned ? 'rgba(255, 0, 0, 0.8)' : 'rgba(139, 69, 19, 0.8)'),
-                        pointRadius: data.map(d => d.poisoned ? 6 : 4),
-                        pointHoverBackgroundColor: 'red',
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const d = data[context.dataIndex];
-                                    return d.poisoned ? `Отравление! 🤢` : `Нормально`;
+        // Генерируем задний фон из слегка мигающих какашек
+        (function generatePoopBackground() {
+            const holder = document.getElementById('poopBg');
+            const rows = 8; const cols = 14; // more density
+            const vw = window.innerWidth; const vh = window.innerHeight;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const span = document.createElement('span');
+                    span.className = 'poop';
+                    span.textContent = '💩';
+                    const x = (c + Math.random()*0.4) / cols * vw;
+                    const y = (r + Math.random()*0.4) / rows * vh;
+                    span.style.left = x + 'px';
+                    span.style.top = y + 'px';
+                    span.style.animationDelay = (Math.random()*4).toFixed(2) + 's';
+                    span.style.opacity = (0.35 + Math.random()*0.3).toFixed(2); // stronger visibility
+                    holder.appendChild(span);
+                }
+            }
+            window.addEventListener('resize', () => { holder.innerHTML=''; generatePoopBackground(); }, { once: true });
+        })();
+
+        // Foreground 10s poop rain on load
+        function startPoopRain(durationMs = 10000) {
+            const rain = document.getElementById('poopRain');
+            const count = Math.floor(window.innerWidth / 20); // responsive amount
+            const createDrop = (delayMs) => {
+                const span = document.createElement('span');
+                span.className = 'poop-drop';
+                span.textContent = Math.random() < 0.85 ? '💩' : '🚽';
+                const startX = Math.random() * window.innerWidth;
+                const dur = 2500 + Math.random() * 2500;
+                span.style.left = startX + 'px';
+                span.style.animationDuration = dur + 'ms';
+                span.style.animationDelay = delayMs + 'ms';
+                rain.appendChild(span);
+                setTimeout(() => { span.remove(); }, delayMs + dur + 100);
+            };
+            for (let i = 0; i < count; i++) {
+                createDrop(Math.random()*1500);
+            }
+            const interval = setInterval(() => {
+                for (let i = 0; i < Math.max(6, Math.floor(count*0.15)); i++) createDrop(0);
+            }, 400);
+            setTimeout(() => { clearInterval(interval); }, durationMs);
+        }
+
+        // Анимация появления блоков
+        function animateCharts() {
+            const charts = document.querySelectorAll('.chart-container');
+            charts.forEach((chart, index) => {
+                setTimeout(() => {
+                    chart.classList.add('visible');
+                }, 600 + index * 400);
+            });
+        }
+
+        // Отрисовка графиков с анимацией
+        function createChart(canvasId, config) {
+            const canvas = document.getElementById(canvasId);
+            const parent = canvas.parentElement;
+            // ensure canvas matches container
+            canvas.width = Math.max(parent.clientWidth - 40, 320);
+            canvas.height = Math.max(parent.clientHeight - 60, 220);
+            const ctx = canvas.getContext('2d');
+            let animationFrame;
+            let progress = 0;
+
+            const render = () => {
+                if (progress < 1) {
+                    progress = Math.min(progress + 0.02, 1);
+                    drawFrame(ctx, config, progress);
+                    animationFrame = requestAnimationFrame(render);
+                } else {
+                    drawFrame(ctx, config, 1);
+                }
+            };
+
+            const drawFrame = (ctx, config, progress) => {
+                const type = config.type;
+                const data = config.data;
+                const options = config.options;
+                const width = ctx.canvas.width;
+                const height = ctx.canvas.height;
+                const labels = data.labels || [];
+                const datasets = data.datasets || [];
+
+                ctx.clearRect(0, 0, width, height);
+
+                // Темный фон
+                ctx.fillStyle = '#1e1e1e';
+                ctx.fillRect(0, 0, width, height);
+
+                if (type === 'bar' || type === 'line') {
+                    const barWidth = 40;
+                    const spacing = (width - labels.length * barWidth) / (labels.length + 1);
+                    const startX = spacing;
+                    const maxValue = Math.max(...datasets.flatMap(d => d.data));
+                    const niceMax = Math.pow(10, Math.floor(Math.log10(maxValue)));
+                    const maxY = Math.ceil(maxValue / niceMax * 5) * (niceMax / 5) * 1.1; // nice rounding
+                    const yAxisLeft = 40;
+                    const chartBottom = height - 80;
+                    const chartTop = 50;
+
+                    // grid and ticks
+                    const tickCount = 5;
+                    const step = maxY / tickCount;
+                    ctx.strokeStyle = '#2f2f2f';
+                    ctx.lineWidth = 1;
+                    ctx.font = '12px Arial';
+                    ctx.fillStyle = '#9aa7b0';
+                    for (let t = 0; t <= tickCount; t++) {
+                        const value = t * step;
+                        const y = chartBottom - (value / maxY) * (chartBottom - chartTop);
+                        ctx.beginPath();
+                        ctx.moveTo(yAxisLeft, y);
+                        ctx.lineTo(width - 20, y);
+                        ctx.stroke();
+                        ctx.fillText(Math.round(value).toString(), 6, y + 4);
+                    }
+
+                    labels.forEach((label, index) => {
+                        const x = startX + index * (barWidth + spacing);
+                        datasets.forEach((dataset, dsIndex) => {
+                            if (dataset.type === 'line') {
+                                if (index > 0) {
+                                    const prevX = startX + (index - 1) * (barWidth + spacing) + barWidth / 2;
+                                    const prevY = chartBottom - (dataset.data[index - 1] / maxY) * (chartBottom - chartTop) * progress;
+                                    const currX = x + barWidth / 2;
+                                    const currY = chartBottom - (dataset.data[index] / maxY) * (chartBottom - chartTop) * progress;
+                                    ctx.beginPath();
+                                    ctx.moveTo(prevX, prevY);
+                                    ctx.lineTo(currX, currY);
+                                    ctx.strokeStyle = dataset.borderColor || '#bb86fc';
+                                    ctx.lineWidth = 3;
+                                    ctx.stroke();
+                                }
+                                const pointY = chartBottom - (dataset.data[index] / maxY) * (chartBottom - chartTop) * progress;
+                                ctx.beginPath();
+                                ctx.arc(x + barWidth / 2, pointY, 6, 0, 2 * Math.PI);
+                                ctx.fillStyle = dataset.borderColor || '#bb86fc';
+                                ctx.fill();
+                                // draw emoji for line point if provided
+                                if (dataset.emoji) {
+                                    ctx.font = '20px "Segoe UI Emoji", "Apple Color Emoji", Arial';
+                                    ctx.textAlign = 'center';
+                                    ctx.fillText(dataset.emoji, x + barWidth / 2, pointY - 12);
+                                }
+                            } else {
+                                const barHeight = (dataset.data[index] / maxY) * (chartBottom - chartTop) * progress;
+                                const y = chartBottom - barHeight;
+                                const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+                                gradient.addColorStop(0, '#bb86fc');
+                                gradient.addColorStop(1, '#3700b3');
+                                ctx.fillStyle = gradient;
+                                ctx.fillRect(x, y, barWidth, barHeight);
+                                ctx.strokeStyle = '#03dac6';
+                                ctx.lineWidth = 2;
+                                ctx.strokeRect(x, y, barWidth, barHeight);
+                                // emoji on top of bar
+                                if (dataset.emoji) {
+                                    ctx.font = '20px "Segoe UI Emoji", "Apple Color Emoji", Arial';
+                                    ctx.textAlign = 'center';
+                                    ctx.fillText(dataset.emoji, x + barWidth / 2, y - 6);
                                 }
                             }
-                        }
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Температура и количество дефекаций по локациям'
-                    },
-                    tooltip: {
-                        enabled: true
-                    }
-                },
-                scales: {
-                    'y-temp': {
-                        type: 'linear',
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'Температура (°C)'
-                        }
-                    },
-                    'y-pooping': {
-                        type: 'linear',
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'Количество дефекаций <span class="emoji">💩</span>'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        }
-                    }
+                        });
+                        ctx.fillStyle = '#e0e0e0';
+                        ctx.font = '12px Arial';
+                        ctx.fillText(label, x + barWidth / 2, height - 10);
+                    });
+
+                    // Оси
+                    ctx.strokeStyle = '#3a3a3a';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(yAxisLeft, chartTop);
+                    ctx.lineTo(yAxisLeft, chartBottom);
+                    ctx.lineTo(width - 20, chartBottom);
+                    ctx.stroke();
+
+                    // Заголовок
+                    ctx.fillStyle = '#bb86fc';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText(options.plugins.title.text, width / 2 - 100, 30);
                 }
-            }
-        });
 
-        // Диаграмма 2: Влажность и количество дефекаций
-        const humidityCtx = document.getElementById('humidityPoopChart').getContext('2d');
-        new Chart(humidityCtx, {
-            type: 'bar',
-             {
-                labels: allCities,
-                datasets: [
-                    {
-                        label: 'Влажность (%) 💧',
-                         data.map(d => d.humidity),
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        yAxisID: 'y-humidity'
-                    },
-                    {
-                        label: 'Дефекации <span class="emoji">💩</span>',
-                         data.map(d => d.poopCount),
-                        type: 'line',
-                        borderColor: 'rgba(139, 69, 19, 1)',
-                        backgroundColor: 'rgba(139, 69, 19, 0.2)',
-                        fill: false,
-                        yAxisID: 'y-pooping'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Влажность и количество дефекаций по локациям'
-                    }
-                },
-                scales: {
-                    'y-humidity': {
-                        type: 'linear',
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: 'Влажность (%)'
+                if (type === 'pie') {
+                    const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                    let startAngle = -Math.PI / 2;
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+                    const radius = Math.min(centerX, centerY) - 60;
+
+                    const sliceEmojis = options.sliceEmojis || [];
+                    data.datasets[0].data.forEach((value, i) => {
+                        const sliceAngle = (value / total) * 2 * Math.PI * progress;
+                        ctx.beginPath();
+                        ctx.moveTo(centerX, centerY);
+                        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+                        ctx.closePath();
+                        ctx.fillStyle = data.datasets[0].backgroundColor[i];
+                        ctx.fill();
+                        ctx.strokeStyle = '#121212';
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+
+                        // draw emoji near the middle of the slice arc
+                        if (sliceEmojis[i]) {
+                            const mid = startAngle + sliceAngle / 2;
+                            const ex = centerX + Math.cos(mid) * (radius - 25);
+                            const ey = centerY + Math.sin(mid) * (radius - 25);
+                            ctx.font = '22px "Segoe UI Emoji", "Apple Color Emoji", Arial';
+                            ctx.textAlign = 'center';
+                            ctx.fillText(sliceEmojis[i], ex, ey);
                         }
-                    },
-                    'y-pooping': {
-                        type: 'linear',
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: 'Количество дефекаций <span class="emoji">💩</span>'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        }
-                    }
+
+                        startAngle += sliceAngle;
+                    });
+
+                    ctx.fillStyle = '#bb86fc';
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillText(options.plugins.title.text, width / 2 - 120, 30);
                 }
-            }
-        });
+            };
 
-        // Диаграмма 3: Погода и количество дефекаций
-        const weatherCtx = document.getElementById('weatherPoopChart').getContext('2d');
-        const weatherLabels = ['Дождь', 'Облачно'];
-        const weatherData = weatherLabels.map(weather => {
-            return data
-                .filter(d => d.weather === weather)
-                .map(d => d.poopCount)
-                .reduce((a, b) => a + b, 0);
-        });
+            setTimeout(() => {
+                animationFrame = requestAnimationFrame(render);
+            }, 200);
 
-        new Chart(weatherCtx, {
-            type: 'pie',
-            data: {
-                labels: weatherLabels,
-                datasets: [{
-                    label: 'Количество дефекаций',
-                     weatherData,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',  // дождь
-                        'rgba(54, 162, 235, 0.7)'   // облачно
-                    ],
-                    hoverOffset: 10
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Распределение дефекаций по типу погоды'
+            // Redraw on resize at final state
+            window.addEventListener('resize', () => {
+                canvas.width = Math.max(parent.clientWidth - 40, 320);
+                canvas.height = Math.max(parent.clientHeight - 60, 220);
+                drawFrame(ctx, config, 1);
+            });
+        }
+
+        // Инициализация после загрузки
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                animateCharts();
+                startPoopRain(10000);
+
+                // Графики
+                setTimeout(() => createChart('canvasTempPoop', {
+                    type: 'bar',
+                    data: {
+                        labels: allCities,
+                        datasets: [
+                            { label: 'Температура', data: data.map(d => d.temp), type: 'bar', borderColor: '#03dac6' },
+                            { label: 'Какашки 💩', data: data.map(d => d.poopCount), type: 'line', borderColor: '#8d6e63' }
+                        ]
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const weather = context.label;
-                                const value = context.raw;
-                                return `${weather}: ${value} раз <span class="emoji">💩</span>`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+                    options: { plugins: { title: { text: '🌡️ Температура и какашки' } } }
+                }), 300);
 
-        // Диаграмма 4: Наличие тёплой воды и качество сна
-        const waterSleepCtx = document.getElementById('waterSleepChart').getContext('2d');
-        const sleepLabels = ['плохо', 'хорошо'];
-        const warmWaterData = sleepLabels.map(sleep => {
-            return filteredData
-                .filter(d => d.sleep === sleep && d.warmWater === true)
-                .length;
-        });
-        const coldWaterData = sleepLabels.map(sleep => {
-            return filteredData
-                .filter(d => d.sleep === sleep && d.warmWater === false)
-                .length;
-        });
-
-        new Chart(waterSleepCtx, {
-            type: 'bar',
-             {
-                labels: sleepLabels,
-                datasets: [
-                    {
-                        label: 'Есть тёплая вода 🚿',
-                        data: warmWaterData,
-                        backgroundColor: 'rgba(75, 192, 192, 0.7)'
+                setTimeout(() => createChart('canvasHumidityPoop', {
+                    type: 'bar',
+                    data: {
+                        labels: allCities,
+                        datasets: [
+                            { label: 'Влажность', data: data.map(d => d.humidity), type: 'bar', borderColor: '#29b6f6' },
+                            { label: 'Какашки 💩', data: data.map(d => d.poopCount), type: 'line', borderColor: '#8d6e63' }
+                        ]
                     },
-                    {
-                        label: 'Нет тёплой воды 🚫🚿',
-                         coldWaterData,
-                        backgroundColor: 'rgba(255, 159, 64, 0.7)'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Качество сна в зависимости от наличия тёплой воды'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Количество ночей'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Качество сна'
-                        }
-                    }
-                }
-            }
-        });
+                    options: { plugins: { title: { text: '💧 Влажность и какашки' } } }
+                }), 700);
 
-        // Диаграмма 5: Отравление и количество дефекаций
-        const poisonCtx = document.getElementById('poisoningPoopChart').getContext('2d');
-        const poisonedData = filteredData
-            .filter(d => d.poisoned)
-            .map(d => d.poopCount);
-        const notPoisonedData = filteredData
-            .filter(d => !d.poisoned)
-            .map(d => d.poopCount);
-
-        const avgPoison = poisonedData.length > 0 ? poisonedData.reduce((a, b) => a + b, 0) / poisonedData.length : 0;
-        const avgNotPoison = notPoisonedData.length > 0 ? notPoisonedData.reduce((a, b) => a + b, 0) / notPoisonedData.length : 0;
-
-        new Chart(poisonCtx, {
-            type: 'bar',
-             {
-                labels: ['Отравился 🤢', 'Без отравления ✅'],
-                datasets: [{
-                    label: 'Среднее количество дефекаций <span class="emoji">💩</span>',
-                    data: [avgPoison, avgNotPoison],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.8)',
-                        'rgba(153, 102, 255, 0.8)'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Среднее количество дефекаций: отравление vs без отравления'
+                setTimeout(() => createChart('canvasWeatherPoop', {
+                    type: 'pie',
+                    data: {
+                        labels: ['Дождь', 'Облачно'],
+                        datasets: [{
+                            data: ['Дождь', 'Облачно'].map(w => data.filter(d => d.weather === w).reduce((a, b) => a + b.poopCount, 0)),
+                            backgroundColor: ['#f44336', '#2196f3']
+                        }]
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Среднее: ${context.raw.toFixed(1)} <span class="emoji">💩</span>`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Среднее количество дефекаций'
-                        }
-                    }
-                }
-            }
-        });
+                    options: { plugins: { title: { text: '☔ Общее количество какашек по погоде' } }, sliceEmojis: ['🌧️','☁️'] }
+                }), 1100);
 
-        // Диаграмма 6: Пройденные километры и дефекации
-        const distanceCtx = document.getElementById('distanceChart').getContext('2d');
-        new Chart(distanceCtx, {
-            type: 'bubble',
-             {
-                labels: allCities,
-                datasets: allCities.map((city, i) => {
-                    const d = data[i];
-                    return {
-                        label: city,
-                        data: [{
-                            x: d.distance,
-                            y: d.poopCount,
-                            r: d.poopCount * 3  // размер пузыря зависит от количества какашек
-                        }],
-                        backgroundColor: d.poisoned 
-                            ? 'rgba(255, 0, 0, 0.6)' 
-                            : 'rgba(75, 192, 192, 0.6)',
-                        borderColor: '#fff',
-                        borderWidth: 2
-                    };
-                })
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Пройденные км 🚴‍♂️ и количество дефекаций <span class="emoji">💩</span>'
+                setTimeout(() => createChart('canvasWaterSleep', {
+                    type: 'bar',
+                    data: {
+                        labels: ['плохо', 'хорошо'],
+                        datasets: [
+                            { label: 'Есть вода 🚿', data: [1, 1], backgroundColor: '#03dac6' },
+                            { label: 'Нет воды 🚫', data: [2, 0], backgroundColor: '#cf6679' }
+                        ]
                     },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const d = data[context.dataIndex];
-                                return `${d.city}: ${d.distance} км, ${d.poopCount} раз <span class="emoji">💩</span>`;
-                            }
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Пройдено км 🚴‍♂️'
-                        }
+                    options: { plugins: { title: { text: '🚿 Влияние воды на сон' } } }
+                }), 1500);
+
+                setTimeout(() => createChart('canvasPoisoningPoop', {
+                    type: 'bar',
+                    data: {
+                        labels: ['Отравился 🤢', 'Здоров ✅'],
+                        datasets: [{
+                            label: 'Среднее 💩',
+                            data: [6.5, 7],
+                            backgroundColor: ['#ff5252', '#304ffe']
+                        }]
                     },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Количество дефекаций <span class="emoji">💩</span>'
-                        },
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+                    options: { plugins: { title: { text: '🤢 Отравление и количество какашек' } } }
+                }), 1900);
+
+                setTimeout(() => createChart('canvasDistance', {
+                    type: 'bar',
+                    data: {
+                        labels: allCities,
+                        datasets: [
+                            { label: 'Км пройдено', data: data.map(d => d.distance), type: 'bar', borderColor: '#00e5ff', emoji: '🚴‍♂️' },
+                            { label: 'Какашки 💩', data: data.map(d => d.poopCount), type: 'line', borderColor: '#ff1744', emoji: '💩' }
+                        ]
+                    },
+                    options: { plugins: { title: { text: '🚴‍♂️ Пройдено км и какашки' } } }
+                }), 2300);
+            }, 800);
+        };
     </script>
 </body>
 </html>
